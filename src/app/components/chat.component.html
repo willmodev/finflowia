@@ -1,114 +1,141 @@
 <!-- Contenedor principal con tema oscuro -->
-<div class="flex flex-col h-screen bg-gray-900 text-white">
-  <!-- Header -->
-  <div class="bg-gray-800 border-b border-gray-700 p-4">
-    <h1 class="text-xl font-semibold text-center">Lyra - Asistente de Gastos</h1>
-  </div>
+<div class="flex flex-col h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white">
+  <!-- Wrapper para centrar y limitar ancho -->
+  <div class="max-w-4xl mx-auto w-full flex flex-col h-full">
 
-  <!-- Área de mensajes -->
+  <!-- Área de mensajes mejorada -->
   <div #messagesContainer
-    class="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-800">
-    <!-- Mensaje de bienvenida -->
-    <div *ngIf="messages.length === 0" class="text-center text-gray-400 mt-8">
-      <div class="mb-4">
-        <div class="w-16 h-16 mx-auto bg-blue-600 rounded-full flex items-center justify-center mb-4">
-          <span class="text-2xl">💰</span>
+    class="flex-1 overflow-y-auto p-6 space-y-2 scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-800">
+    
+    <!-- Mensaje de bienvenida mejorado -->
+    <div *ngIf="messages.length === 0" class="text-center text-gray-300 mt-12 animate-fade-in">
+      <div class="mb-6">
+        <div class="w-20 h-20 mx-auto bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center mb-6 shadow-xl animate-bounce-slow">
+          <span class="text-3xl">💰</span>
         </div>
-        <h2 class="text-lg font-medium mb-2">¡Hola! Soy Lyra</h2>
-        <p class="text-sm">Tu asistente personal para registrar gastos.</p>
-        <p class="text-sm mt-2">Puedes enviarme tus gastos por texto o nota de voz.</p>
+        <h2 class="text-2xl font-bold mb-3 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+          ¡Hola! Soy Lyra
+        </h2>
+        <p class="text-base mb-2 opacity-90">Tu asistente personal para registrar gastos.</p>
+        <p class="text-sm opacity-75">Puedes enviarme tus gastos por texto o nota de voz.</p>
+        
+        <!-- Ejemplos de uso -->
+        <div class="mt-6 space-y-2">
+          <div class="inline-block bg-gray-800 px-4 py-2 rounded-full text-xs opacity-60 mx-1">
+            "Compré café por $5"
+          </div>
+          <div class="inline-block bg-gray-800 px-4 py-2 rounded-full text-xs opacity-60 mx-1">
+            "Gasolina $50"
+          </div>
+          <div class="inline-block bg-gray-800 px-4 py-2 rounded-full text-xs opacity-60 mx-1">
+            🎤 Nota de voz
+          </div>
+        </div>
       </div>
     </div>
 
-    <!-- Lista de mensajes -->
-    <!-- En la sección de mensajes, actualiza el ngFor -->
-    <div *ngFor="let message of messages" 
-         class="mb-4 flex" 
-         [ngClass]="{
-           'justify-end': message.isFromUser,
-           'justify-start': !message.isFromUser
-         }">
-      <div class="max-w-xs lg:max-w-md px-4 py-2 rounded-lg" 
-           [ngClass]="{
-             'bg-blue-600 text-white': message.isFromUser,
-             'bg-gray-700 text-gray-100': !message.isFromUser
-           }">
-        <p class="text-sm">{{ message.content }}</p>
-        <p class="text-xs mt-1 opacity-70">
-          {{ message.timestamp | date:'short' }}
-        </p>
-      </div>
+    <!-- Lista de mensajes usando el nuevo componente con signals -->
+    <app-message *ngFor="let message of messages(); trackBy: trackByMessageId" 
+                 [message]="message">
+    </app-message>
+  </div>
+
+  <!-- Mensaje de error mejorado con signals y efectos modernos -->
+  <div *ngIf="errorMessage()" class="bg-gradient-to-r from-red-600 to-red-700 text-white p-4 mx-4 rounded-xl mb-3 shadow-lg shadow-glow-red animate-shake animate-slide-in-up backdrop-blur-sm">
+    <div class="flex items-center space-x-2">
+      <span class="text-lg">⚠️</span>
+      <p class="text-sm font-medium">{{ errorMessage() }}</p>
     </div>
   </div>
 
-  <!-- Mensaje de error -->
-  <div *ngIf="errorMessage" class="bg-red-600 text-white p-3 mx-4 rounded-lg mb-2">
-    <p class="text-sm">{{ errorMessage }}</p>
-  </div>
-
-  <!-- Footer con input y botones -->
-  <div class="bg-gray-800 border-t border-gray-700 p-4">
-    <div class="flex items-end space-x-3">
-      <!-- Campo de entrada de texto -->
-      <div class="flex-1">
-        <textarea #messageInput [(ngModel)]="currentMessage" (keypress)="onKeyPress($event)"
-          placeholder="Escribe tu gasto aquí... (ej: 'Compré café por $5')"
-          class="w-full bg-gray-700 text-white border border-gray-600 rounded-lg px-4 py-3 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder-gray-400"
-          rows="1" [disabled]="isLoading || isRecording"></textarea>
+  <!-- Footer mejorado con input integrado y efectos modernos -->
+  <div class="bg-gradient-to-r from-gray-800 to-gray-700 border-t border-gray-600 p-4 shadow-lg shadow-glow rounded-t-3xl mb-4 mx-4 glass-effect animate-fade-in-scale transition-all-smooth">
+    <!-- Campo de entrada con botones integrados y efectos modernos -->
+    <div class="relative flex items-end bg-gradient-to-r from-gray-700 to-gray-600 rounded-2xl border border-gray-500 rounded-input-focus transition-all-smooth shadow-inner backdrop-blur-md">
+      
+      <!-- Textarea con signals -->
+      <textarea #messageInput 
+                [ngModel]="currentMessage()"
+                (ngModelChange)="currentMessage.set($event)"
+                (keypress)="onKeyPress($event)"
+                (input)="adjustTextareaHeight()"
+                placeholder="Escribe tu gasto aquí... (ej: 'Compré café por $5')"
+                class="flex-1 bg-transparent text-white placeholder-gray-300 border-none outline-none resize-none px-4 py-3 pr-14 min-h-[44px] max-h-[120px] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-transparent"
+                rows="1" 
+                [disabled]="isLoading() || isRecording()"
+                [class.animate-pulse]="isLoading()">
+      </textarea>
+      
+      <!-- Botón de audio (cuando no hay texto) usando computed -->
+      <div *ngIf="canStartRecording()" 
+           class="absolute right-2 bottom-2 z-10">
+        <button (click)="startRecording()" 
+                [disabled]="isLoading()"
+                class="p-2 rounded-full transition-all-smooth focus:outline-none flex items-center justify-center transform hover:scale-110 active:scale-95 cursor-pointer neo-button"
+                [ngClass]="{
+                  'bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-500 hover:to-gray-600 text-gray-300 hover:text-white shadow-glow': !isLoading(),
+                  'bg-gray-500 cursor-not-allowed text-gray-400': isLoading()
+                }" 
+                title="Grabar nota de voz">
+          <app-icon type="microphone" size="4" customClass="transition-colors duration-200"></app-icon>
+        </button>
       </div>
-
-      <!-- Botón de grabación de voz -->
-      <button (click)="toggleVoiceRecording()" [disabled]="isLoading"
-        class="p-3 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 flex items-center justify-center"
-        [ngClass]="{
-          'bg-red-600 hover:bg-red-700': isRecording,
-          'bg-gray-600 hover:bg-gray-500': !isRecording && !isLoading,
-          'bg-gray-500 cursor-not-allowed': isLoading
-        }" title="{{ isRecording ? 'Detener grabación' : 'Grabar nota de voz' }}">
-
-        <!-- Icono de micrófono cuando NO está grabando -->
-        <svg *ngIf="!isRecording" class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-            d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z">
-          </path>
-        </svg>
-
-        <!-- Icono de stop cuando SÍ está grabando -->
-        <svg *ngIf="isRecording" class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg">
-          <path d="M6 6h12v12H6z"></path>
-        </svg>
-      </button>
-
-      <!-- Botón de enviar texto -->
-      <button (click)="sendTextMessage()" [disabled]="!currentMessage.trim() || isLoading || isRecording"
-        class="p-3 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 flex items-center justify-center"
-        [ngClass]="{
-          'bg-blue-600 hover:bg-blue-700': currentMessage.trim() && !isLoading && !isRecording,
-          'bg-gray-500 cursor-not-allowed': !currentMessage.trim() || isLoading || isRecording
-        }" title="Enviar mensaje">
-
-        <!-- Icono de enviar -->
-        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8">
-          </path>
-        </svg>
-      </button>
+      
+      <!-- Botón de stop (cuando está grabando) usando computed -->
+      <div *ngIf="showStopButton()" 
+           class="absolute right-2 bottom-2 z-10">
+        <button (click)="stopRecording()" 
+                [disabled]="isProcessingAudio()"
+                class="p-2 rounded-full transition-all-smooth focus:outline-none flex items-center justify-center transform hover:scale-110 active:scale-95 cursor-pointer neo-button"
+                [ngClass]="{
+                  'bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white shadow-lg shadow-glow-red': !isProcessingAudio(),
+                  'bg-gray-500 cursor-not-allowed text-gray-400': isProcessingAudio()
+                }"
+                [title]="isProcessingAudio() ? 'Procesando audio...' : 'Detener grabación'">
+          <app-icon [type]="isProcessingAudio() ? 'loading' : 'stop'" size="4" customClass="text-white"></app-icon>
+          <!-- Indicador de grabación activa -->
+          <div *ngIf="!isProcessingAudio()" class="absolute -top-1 -right-1 w-3 h-3 bg-red-400 rounded-full animate-pulse"></div>
+        </button>
+      </div>
+      
+      <!-- Botón de enviar (cuando hay texto) usando computed -->
+      <div *ngIf="canSendMessage()" 
+           class="absolute right-2 bottom-2 z-10">
+        <button (click)="sendTextMessage()" 
+                [disabled]="isLoading()"
+                class="p-2 rounded-full transition-all-smooth focus:outline-none flex items-center justify-center transform hover:scale-110 active:scale-95 cursor-pointer neo-button"
+                [ngClass]="{
+                  'bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white shadow-lg shadow-glow': !isLoading(),
+                  'bg-gray-500 cursor-not-allowed text-gray-400': isLoading()
+                }" 
+                title="Enviar mensaje">
+          <app-icon [type]="isLoading() ? 'loading' : 'send'" 
+                    size="4" 
+                    customClass="text-white transition-transform duration-200">
+          </app-icon>
+        </button>
+      </div>
     </div>
 
-    <!-- Indicador de estado -->
-    <div class="mt-2 text-xs text-gray-400 text-center">
-      <span *ngIf="isRecording" class="text-red-400 animate-pulse">
-        🔴 Grabando... Haz clic en el micrófono para detener
-      </span>
-      <span *ngIf="isLoading && !isRecording" class="text-blue-400">
-        📤 Enviando mensaje...
-      </span>
-      <span *ngIf="!isRecording && !isLoading">
-        Presiona Enter para enviar o usa el micrófono para grabar
-      </span>
+    <!-- Indicador de estado mejorado con signals -->
+    <div class="mt-3 text-xs text-center transition-all duration-300">
+      <div *ngIf="isRecording()" class="text-red-400 animate-pulse flex items-center justify-center space-x-2">
+        <span class="w-2 h-2 bg-red-400 rounded-full animate-ping"></span>
+        <span class="font-medium">Grabando... Haz clic en el micrófono para detener</span>
+        <span class="w-2 h-2 bg-red-400 rounded-full animate-ping"></span>
+      </div>
+      
+      <div *ngIf="isLoading() && !isRecording()" class="text-blue-400 flex items-center justify-center space-x-2">
+        <app-icon type="loading" size="3" customClass="text-blue-400"></app-icon>
+        <span class="font-medium">Enviando mensaje...</span>
+      </div>
+      
+      <div *ngIf="!isRecording() && !isLoading()" class="text-gray-400">
+        <span class="opacity-75">Presiona </span>
+        <kbd class="px-2 py-1 bg-gray-600 rounded text-xs font-mono">Enter</kbd>
+        <span class="opacity-75"> para enviar o usa el micrófono para grabar</span>
+      </div>
+    </div>
     </div>
   </div>
 </div>
